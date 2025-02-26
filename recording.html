@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PS Performance Recording</title>
+  <style>
+    body {
+      background-color: #2c2c2c;
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      position: relative;
+    }
+    header {
+      background: linear-gradient(145deg, #333, #444);
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+    }
+    header h1 {
+      margin: 0;
+      font-size: 32px;
+    }
+    /* Tab Menu Styling */
+    .tab {
+      overflow: hidden;
+      background-color: #1a1a1a;
+    }
+    .tab button {
+      background-color: inherit;
+      float: left;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      padding: 14px 16px;
+      transition: 0.3s;
+      font-size: 17px;
+      color: #fff;
+    }
+    .tab button:hover {
+      background-color: #444;
+    }
+    .tab button.active {
+      background-color: #555;
+    }
+    /* Tab Content */
+    .tabcontent {
+      display: none;
+      padding: 20px;
+      background-color: #1a1a1a;
+      border-top: none;
+    }
+    /* Form Styling */
+    .form-container {
+      background-color: #1a1a1a;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 2px 2px 6px rgba(0,0,0,0.5);
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .form-container label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 16px;
+    }
+    .form-container input {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 15px;
+      border: none;
+      border-radius: 4px;
+      background-color: #333;
+      color: #fff;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+    }
+    .form-container button {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      background: linear-gradient(145deg, #333, #444);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      color: #fff;
+      box-shadow: 4px 4px 8px rgba(0,0,0,0.5);
+      transition: background 0.3s, transform 0.2s;
+    }
+    .form-container button:hover {
+      background: linear-gradient(145deg, #444, #333);
+      transform: translateY(-2px);
+    }
+    .success-message {
+      display: none;
+      margin-top: 15px;
+      font-size: 16px;
+      color: #4CAF50;
+      text-align: center;
+    }
+    /* Help Icon Styling */
+    #helpIcon {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background-color: #444;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 24px;
+      box-shadow: 2px 2px 5px #141414;
+      z-index: 1000;
+    }
+    /* Back Button (Bottom Left) */
+    .back-button {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background-color: #444;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      cursor: pointer;
+      font-size: 28px;
+      color: #fff;
+      box-shadow: 2px 2px 6px rgba(0,0,0,0.5);
+      transition: background 0.3s;
+      z-index: 1000;
+    }
+    .back-button:hover {
+      background-color: #555;
+    }
+    /* Modal Styling */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1100;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.5);
+    }
+    .modal-content {
+      background-color: #1a1a1a;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 90%;
+      max-width: 500px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.8);
+      text-align: center;
+    }
+    .modal-content h2 {
+      margin-top: 0;
+      font-size: 24px;
+    }
+    .modal-content p {
+      font-size: 16px;
+    }
+    .modal-content button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 14px;
+      background: linear-gradient(145deg, #333, #444);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 3px 3px 6px #141414;
+      transition: background 0.3s;
+    }
+    .modal-content button:hover {
+      background: linear-gradient(145deg, #444, #333);
+    }
+    /* Tab Content Specific for Dispatch (Form) */
+    /* (Restul secțiunilor de tab pot rămâne ca placeholder) */
+  </style>
+</head>
+<body>
+  <!-- Back Button (Bottom Left) -->
+  <button class="back-button" onclick="goBack()">&#8592;</button>
+  
+  <!-- Help Icon -->
+  <div id="helpIcon" onclick="openHelpModal()">?</div>
+  
+  <header>
+    <h1>PS Performance Recording</h1>
+  </header>
+  
+  <!-- Tab Menu -->
+  <div class="tab">
+    <button class="tablinks" onclick="openSection(event, 'Dispatch')" id="defaultOpen">Dispatch</button>
+    <button class="tablinks" onclick="openSection(event, 'Inbound')">Inbound</button>
+    <button class="tablinks" onclick="openSection(event, 'Pick')">Pick</button>
+    <button class="tablinks" onclick="openSection(event, 'Freezer')">Freezer</button>
+    <button class="tablinks" onclick="openSection(event, 'SAT')">SAT</button>
+  </div>
+  
+  <!-- Tab Content Sections -->
+  
+  <!-- Dispatch Section -->
+  <div id="Dispatch" class="tabcontent">
+    <h2>Dispatch</h2>
+    <div class="form-container">
+      <form id="dispatchForm">
+        <label for="dispatchPSName">PS Name:</label>
+        <input type="text" id="dispatchPSName" placeholder="Enter PS Name" required>
+        
+        <label for="dispatchHandscan">Handscan:</label>
+        <input type="text" id="dispatchHandscan" placeholder="Enter Handscan" required>
+        
+        <label for="dispatchDate">Date:</label>
+        <input type="date" id="dispatchDate" required>
+        
+        <label for="dispatchUPH">UPH (Units Per Hour):</label>
+        <input type="number" id="dispatchUPH" placeholder="Enter UPH" required>
+        
+        <label for="dispatchDTLoaded">DT Loaded:</label>
+        <input type="number" id="dispatchDTLoaded" placeholder="Enter DT Loaded" required>
+        
+        <button type="submit">Submit Recording</button>
+      </form>
+      <div id="dispatchSuccessMessage" class="success-message">Recording submitted successfully!</div>
+    </div>
+  </div>
+  
+  <!-- Inbound Section -->
+  <div id="Inbound" class="tabcontent">
+    <h2>Inbound</h2>
+    <div class="form-container">
+      <form id="inboundForm">
+        <label for="inboundPSName">PS Name:</label>
+        <input type="text" id="inboundPSName" placeholder="Enter PS Name" required>
+        
+        <label for="inboundHandscan">Handscan:</label>
+        <input type="text" id="inboundHandscan" placeholder="Enter Handscan" required>
+        
+        <label for="inboundDate">Date:</label>
+        <input type="date" id="inboundDate" required>
+        
+        <label for="inboundUPH">UPH (Units Per Hour):</label>
+        <input type="number" id="inboundUPH" placeholder="Enter UPH" required>
+        
+        <label for="itemsDecanted">Items Decanted:</label>
+        <input type="number" id="itemsDecanted" placeholder="Enter Items Decanted" required>
+        
+        <button type="submit">Submit Recording</button>
+      </form>
+      <div id="inboundSuccessMessage" class="success-message">Recording submitted successfully!</div>
+    </div>
+  </div>
+  
+  <!-- Pick Section -->
+  <div id="Pick" class="tabcontent">
+    <h2>Pick</h2>
+    <div class="form-container">
+      <form id="pickForm">
+        <label for="pickPSName">PS Name:</label>
+        <input type="text" id="pickPSName" placeholder="Enter PS Name" required>
+        
+        <label for="pickHandscan">Handscan:</label>
+        <input type="text" id="pickHandscan" placeholder="Enter Handscan" required>
+        
+        <label for="pickDate">Date:</label>
+        <input type="date" id="pickDate" required>
+        
+        <label for="pickUPH">UPH (Units Per Hour):</label>
+        <input type="number" id="pickUPH" placeholder="Enter UPH" required>
+        
+        <label for="itemsPicked">Items Picked:</label>
+        <input type="number" id="itemsPicked" placeholder="Enter Items Picked" required>
+        
+        <button type="submit">Submit Recording</button>
+      </form>
+      <div id="pickSuccessMessage" class="success-message">Recording submitted successfully!</div>
+    </div>
+  </div>
+  
+  <!-- Freezer Section -->
+  <div id="Freezer" class="tabcontent">
+    <h2>Freezer</h2>
+    <div class="form-container">
+      <form id="freezerForm">
+        <label for="freezerPSName">PS Name:</label>
+        <input type="text" id="freezerPSName" placeholder="Enter PS Name" required>
+        
+        <label for="freezerHandscan">Handscan:</label>
+        <input type="text" id="freezerHandscan" placeholder="Enter Handscan" required>
+        
+        <label for="freezerDate">Date:</label>
+        <input type="date" id="freezerDate" required>
+        
+        <label for="freezerUPH">UPH (Units Per Hour):</label>
+        <input type="number" id="freezerUPH" placeholder="Enter UPH" required>
+        
+        <label for="freezerItemsPicked">Items Picked:</label>
+        <input type="number" id="freezerItemsPicked" placeholder="Enter Items Picked" required>
+        
+        <button type="submit">Submit Recording</button>
+      </form>
+      <div id="freezerSuccessMessage" class="success-message">Recording submitted successfully!</div>
+    </div>
+  </div>
+  
+  <!-- SAT Section (Placeholder) -->
+  <div id="SAT" class="tabcontent">
+    <h2>SAT</h2>
+    <p>Record performance details for the SAT section here.</p>
+  </div>
+  
+  <!-- Help Modal -->
+  <div id="helpModal" class="modal">
+    <div class="modal-content">
+      <h2>About PS Performance Recording</h2>
+      <p>
+        This page allows you to record performance details for a Personal Shopper during their shift.
+        It is divided into sections: <strong>Dispatch, Inbound, Pick, Freezer,</strong> and <strong>SAT</strong>.
+        In the Dispatch section, fill in PS Name, Handscan, Date, UPH, and DT Loaded.
+        In the Inbound section, fill in PS Name, Handscan, Date, UPH, and Items Decanted.
+        In the Pick section, fill in PS Name, Handscan, Date, UPH, and Items Picked.
+        In the Freezer section, fill in PS Name, Handscan, Date, UPH, and Items Picked.
+      </p>
+      <button onclick="closeHelpModal()">Close</button>
+    </div>
+  </div>
+  
+  <script>
+    // Tab menu functionality
+    function openSection(evt, sectionName) {
+      var i, tabcontent, tablinks;
+      tabcontent = document.getElementsByClassName("tabcontent");
+      for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+      }
+      tablinks = document.getElementsByClassName("tablinks");
+      for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+      }
+      document.getElementById(sectionName).style.display = "block";
+      evt.currentTarget.className += " active";
+    }
+    
+    // Open the default tab
+    document.getElementById("defaultOpen").click();
+    
+    // Back button functionality
+    function goBack() {
+      window.location.href = "index.html";
+    }
+    
+    // Help modal functions
+    function openHelpModal() {
+      document.getElementById("helpModal").style.display = "block";
+    }
+    function closeHelpModal() {
+      document.getElementById("helpModal").style.display = "none";
+    }
+    window.onclick = function(event) {
+      const modal = document.getElementById("helpModal");
+      if (event.target === modal) {
+        modal.style.display = "none";
+      }
+    };
+    
+    // Handle form submission for each section
+    document.getElementById("dispatchForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      document.getElementById("dispatchSuccessMessage").style.display = "block";
+      this.reset();
+    });
+    document.getElementById("inboundForm") && document.getElementById("inboundForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      document.getElementById("inboundSuccessMessage").style.display = "block";
+      this.reset();
+    });
+    document.getElementById("pickForm") && document.getElementById("pickForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      document.getElementById("pickSuccessMessage").style.display = "block";
+      this.reset();
+    });
+    document.getElementById("freezerForm") && document.getElementById("freezerForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      document.getElementById("freezerSuccessMessage").style.display = "block";
+      this.reset();
+    });
+  </script>
+</body>
+</html>
+
